@@ -64,7 +64,7 @@ namespace ASCOM.USB_Focus
         private void updateCurrentPASteps()
         {
             string textPA;
-            string textSteps;
+            string textSteps = "d/c";
             while (true)
             {
                 if (IsConnected) {
@@ -75,7 +75,7 @@ namespace ASCOM.USB_Focus
                     else
                     {
                         textPA = driver.Position.ToString();
-                        textSteps = driver.Action("PAToSteps",textPA);
+                        textSteps = driver.Action("PAToStepsPublic",textPA);
                     }
                 }
                 else {

@@ -179,7 +179,8 @@ namespace ASCOM.USB_Focus
 
         public string Action(string actionName, string actionParameters)
         {
-            
+            //LogMessage("", "Action {0}, parameters {1} not implemented", actionName, actionParameters);
+            //throw new ASCOM.ActionNotImplementedException("Action " + actionName + " is not implemented by this driver");
             //Get the method information using the method info class
             MethodInfo mi = this.GetType().GetMethod(actionName);
 
@@ -507,10 +508,10 @@ namespace ASCOM.USB_Focus
             return stepPosition;
         }
 
-        public string PAToSteps(string Position)
+        public string PAToStepsPublic(string Position)
         {
-            float rotatorPosition = int.Parse(Position);
-            int stepPosition = (int)(((180 - rotatorPosition) * (maxSteps / 2)) / 180);
+            float rotatorPosition = float.Parse(Position);
+        int stepPosition = (int)(((180 - rotatorPosition) * (maxSteps / 2)) / 180);
             if (rotatorPosition > 180.0)
             {
                 stepPosition += maxSteps;
