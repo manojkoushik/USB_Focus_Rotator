@@ -178,8 +178,14 @@ namespace ASCOM.USB_Focus
 
         public string Action(string actionName, string actionParameters)
         {
-            LogMessage("", "Action {0}, parameters {1} not implemented", actionName, actionParameters);
-            throw new ASCOM.ActionNotImplementedException("Action " + actionName + " is not implemented by this driver");
+            
+            //Get the method information using the method info class
+            MethodInfo mi = this.GetType().GetMethod(actionName);
+
+            //Invoke the method
+            // (null- no parameter for the method call
+            // or you can pass the array of parameters...)
+            mi.Invoke(this, actionParameters);
         }
 
         public void CommandBlind(string command, bool raw)
@@ -498,6 +504,18 @@ namespace ASCOM.USB_Focus
             if (isLogEnabled)
                 Logger.Write("Position Angle:" + Position.ToString() + " Step Position:" + stepPosition.ToString()); // Move to this position
             return stepPosition;
+        }
+
+        public string PAToSteps(string Position)
+        {
+            float rotatorPosition = int.Parse(Position);
+            int stepPosition = (int)(((180 - rotatorPosition) * (maxSteps / 2)) / 180);
+            if (rotatorPosition > 180.0)
+            {
+                stepPosition += maxSteps;
+            }
+            return stepPosition.ToString();
+
         }
         private float StepsToPA(int steps)
         {
