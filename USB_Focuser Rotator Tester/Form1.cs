@@ -74,8 +74,8 @@ namespace ASCOM.USB_Focus
                     }
                     else
                     {
-                        textPA = driver.TargetPosition.ToString();
-                        textSteps = driver.Position.ToString();
+                        textPA = driver.Position.ToString();
+                        textSteps = driver.Action("PAToSteps",textPA);
                     }
                 }
                 else {

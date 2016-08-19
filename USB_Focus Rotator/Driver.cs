@@ -40,6 +40,7 @@ using ASCOM.Utilities;
 using ASCOM.DeviceInterface;
 using System.Globalization;
 using System.Collections;
+using System.Reflection;
 
 namespace ASCOM.USB_Focus
 {
@@ -185,7 +186,7 @@ namespace ASCOM.USB_Focus
             //Invoke the method
             // (null- no parameter for the method call
             // or you can pass the array of parameters...)
-            mi.Invoke(this, actionParameters);
+            return (string)(mi.Invoke(this, actionParameters.Split(',')));
         }
 
         public void CommandBlind(string command, bool raw)
@@ -373,7 +374,7 @@ namespace ASCOM.USB_Focus
                     {
                         if (isLogEnabled)
                             Logger.Write("\r\n---------------------------------------------------------------------------------------INIT\r\n");
-                        iPosition = (int)this.Position;                          // Get current position and temp from Focuser
+                        iPosition = PAToSteps(this.Position);                          // Get current position and temp from Focuser
                     }
                     catch (Exception ex)
                     {
@@ -611,8 +612,9 @@ namespace ASCOM.USB_Focus
             string msgLog = "";
             CID++;
 
+            rotatorPosition = Position;
             int targetPosition = PAToSteps(Position);
-            int delta = targetPosition - (int)this.iPosition;
+            int delta = targetPosition - this.iPosition;
 
             bMoving = true;
 
@@ -717,8 +719,7 @@ namespace ASCOM.USB_Focus
                     if (isLogEnabled)
                         Logger.Write(msgLog);
 
-                    rotatorPosition = StepsToPA(iPosition);
-                    return iPosition;
+                    return StepsToPA(iPosition);
                 }
                 catch (Exception ex)
                 {
