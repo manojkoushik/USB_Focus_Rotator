@@ -497,12 +497,7 @@ namespace ASCOM.USB_Focus
 
         private int PAToSteps(float Position)
         {
-            int stepPosition = (int)(((180 - Position) * (maxSteps / 2)) / 180);
-            if (Position > 180.0)
-            {
-                stepPosition += maxSteps;
-            }
-
+            int stepPosition = (int)((360 - Position) * maxSteps);
             if (isLogEnabled)
                 Logger.Write("Position Angle:" + Position.ToString() + " Step Position:" + stepPosition.ToString()); // Move to this position
             return stepPosition;
@@ -511,23 +506,18 @@ namespace ASCOM.USB_Focus
         public string PAToStepsPublic(string Position)
         {
             float rotatorPosition = float.Parse(Position);
-        int stepPosition = (int)(((180 - rotatorPosition) * (maxSteps / 2)) / 180);
-            if (rotatorPosition > 180.0)
-            {
-                stepPosition += maxSteps;
-            }
+            int stepPosition = (int)((360 - Position) * maxSteps);
+
             return stepPosition.ToString();
 
         }
         private float StepsToPA(int steps)
         {
             double positionAngle = steps * 360.0 / maxSteps;
-            if (positionAngle < 180.0)
-                positionAngle = 180.0 - positionAngle;
-            else
-                positionAngle = 360.0 - (positionAngle - 180.0);
+
             if (isLogEnabled)
                 Logger.Write("Step Position:" + steps.ToString() + " PositionAngle:" + positionAngle.ToString()); // Move to this position
+
             return (float)positionAngle;
         }
 
@@ -730,6 +720,15 @@ namespace ASCOM.USB_Focus
 
                     throw new ASCOM.InvalidValueException("PID" + PID + " ER2," + ret + "##, P:" + ret.IndexOf("P=") + "\\r\\n" + ret.IndexOf("\n\r") + "length:" + ret.Length, ex);
                 }
+            }
+
+            set
+            {
+                int stepPosition = PAToSteps(value);
+
+                if (isLogEnabled)
+                    Logger.Write("Setting Position Angle to " + value + "; Corresponding Stepper position is " + stepPosition);
+                CommandString(string.Format("C{0:00000}", stepPosition), true);
             }
         }
 

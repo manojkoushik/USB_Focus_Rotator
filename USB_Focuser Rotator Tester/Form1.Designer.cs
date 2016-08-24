@@ -45,6 +45,8 @@
             this.but1ac = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.currentSteps = new System.Windows.Forms.TextBox();
+            this.butSyncPA = new System.Windows.Forms.Button();
+            this.syncPA = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // buttonChoose
@@ -83,7 +85,7 @@
             // 
             // goToPA
             // 
-            this.goToPA.Location = new System.Drawing.Point(498, 273);
+            this.goToPA.Location = new System.Drawing.Point(498, 284);
             this.goToPA.Name = "goToPA";
             this.goToPA.Size = new System.Drawing.Size(150, 38);
             this.goToPA.TabIndex = 4;
@@ -109,7 +111,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(222, 262);
+            this.button1.Location = new System.Drawing.Point(222, 273);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(157, 58);
             this.button1.TabIndex = 8;
@@ -120,7 +122,7 @@
             // 
             // but1c
             // 
-            this.but1c.Location = new System.Drawing.Point(63, 343);
+            this.but1c.Location = new System.Drawing.Point(63, 458);
             this.but1c.Name = "but1c";
             this.but1c.Size = new System.Drawing.Size(133, 46);
             this.but1c.TabIndex = 9;
@@ -130,7 +132,7 @@
             // 
             // but5c
             // 
-            this.but5c.Location = new System.Drawing.Point(63, 435);
+            this.but5c.Location = new System.Drawing.Point(63, 550);
             this.but5c.Name = "but5c";
             this.but5c.Size = new System.Drawing.Size(133, 46);
             this.but5c.TabIndex = 10;
@@ -140,7 +142,7 @@
             // 
             // but10c
             // 
-            this.but10c.Location = new System.Drawing.Point(222, 343);
+            this.but10c.Location = new System.Drawing.Point(222, 458);
             this.but10c.Name = "but10c";
             this.but10c.Size = new System.Drawing.Size(135, 46);
             this.but10c.TabIndex = 11;
@@ -150,7 +152,7 @@
             // 
             // but15c
             // 
-            this.but15c.Location = new System.Drawing.Point(222, 435);
+            this.but15c.Location = new System.Drawing.Point(222, 550);
             this.but15c.Name = "but15c";
             this.but15c.Size = new System.Drawing.Size(135, 46);
             this.but15c.TabIndex = 12;
@@ -160,7 +162,7 @@
             // 
             // but15ac
             // 
-            this.but15ac.Location = new System.Drawing.Point(453, 435);
+            this.but15ac.Location = new System.Drawing.Point(453, 550);
             this.but15ac.Name = "but15ac";
             this.but15ac.Size = new System.Drawing.Size(134, 46);
             this.but15ac.TabIndex = 13;
@@ -170,7 +172,7 @@
             // 
             // but10ac
             // 
-            this.but10ac.Location = new System.Drawing.Point(453, 343);
+            this.but10ac.Location = new System.Drawing.Point(453, 458);
             this.but10ac.Name = "but10ac";
             this.but10ac.Size = new System.Drawing.Size(134, 46);
             this.but10ac.TabIndex = 14;
@@ -180,7 +182,7 @@
             // 
             // but5ac
             // 
-            this.but5ac.Location = new System.Drawing.Point(631, 435);
+            this.but5ac.Location = new System.Drawing.Point(631, 550);
             this.but5ac.Name = "but5ac";
             this.but5ac.Size = new System.Drawing.Size(118, 46);
             this.but5ac.TabIndex = 15;
@@ -190,7 +192,7 @@
             // 
             // but1ac
             // 
-            this.but1ac.Location = new System.Drawing.Point(631, 343);
+            this.but1ac.Location = new System.Drawing.Point(631, 458);
             this.but1ac.Name = "but1ac";
             this.but1ac.Size = new System.Drawing.Size(118, 46);
             this.but1ac.TabIndex = 16;
@@ -216,11 +218,30 @@
             this.currentSteps.Size = new System.Drawing.Size(150, 38);
             this.currentSteps.TabIndex = 18;
             // 
+            // butSyncPA
+            // 
+            this.butSyncPA.Location = new System.Drawing.Point(222, 363);
+            this.butSyncPA.Name = "butSyncPA";
+            this.butSyncPA.Size = new System.Drawing.Size(157, 55);
+            this.butSyncPA.TabIndex = 19;
+            this.butSyncPA.Text = "Sync PA";
+            this.butSyncPA.UseVisualStyleBackColor = true;
+            this.butSyncPA.Click += new System.EventHandler(this.butSyncPA_Click);
+            // 
+            // syncPA
+            // 
+            this.syncPA.Location = new System.Drawing.Point(498, 372);
+            this.syncPA.Name = "syncPA";
+            this.syncPA.Size = new System.Drawing.Size(150, 38);
+            this.syncPA.TabIndex = 20;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(809, 527);
+            this.ClientSize = new System.Drawing.Size(809, 657);
+            this.Controls.Add(this.syncPA);
+            this.Controls.Add(this.butSyncPA);
             this.Controls.Add(this.currentSteps);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.but1ac);
@@ -266,6 +287,8 @@
         private System.Windows.Forms.Button but1ac;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox currentSteps;
+        private System.Windows.Forms.Button butSyncPA;
+        private System.Windows.Forms.TextBox syncPA;
     }
 }
 

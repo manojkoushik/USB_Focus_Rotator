@@ -111,6 +111,11 @@ namespace ASCOM.USB_Focus
         private void button1_Click(object sender, EventArgs e)
         {
             float positionAngle = float.Parse(goToPA.Text);
+            if (positionAngle > 360 || positionAngle < 0)
+            {
+                MessageBox("Invalid Position Angle!");
+                return;
+            }
             driver.Move(positionAngle);
         }
 
@@ -118,10 +123,10 @@ namespace ASCOM.USB_Focus
         {
             float newPA = oldPA + offset;
             if (newPA > 360)
-                newPA -= 360;
+                newPA = 360;
 
             if (newPA < 0)
-                newPA += 360;
+                newPA = 0;
 
             return newPA;
         }
@@ -214,5 +219,19 @@ namespace ASCOM.USB_Focus
                 }
         }
 
+        private void butSyncPA_Click(object sender, EventArgs e)
+        {
+            if (IsConnected)
+                if (!driver.IsMoving)
+                {
+                    float PA = syncPA.Text;
+                    if (PA > 360 || PA < 0)
+                    {
+                        MessageBox("Invalid Position Angle!");
+                        return;
+                    }             
+                    driver.Position = float.Parse(this.syncPA.Text);
+                }
+        }
     }
 }
