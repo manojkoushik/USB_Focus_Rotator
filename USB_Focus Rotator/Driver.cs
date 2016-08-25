@@ -80,7 +80,7 @@ namespace ASCOM.USB_Focus
         internal static string comPort; // Variables to hold the currrent device configuration
         internal static int maxSteps; // Variables to hold the currrent device configuration
         internal static bool halfSteps = false;
-        internal static bool antiClockwise = true;
+        internal static bool reverse = false;
         internal static int motorSpeed;
 
         internal static string comPortDefault = "COM1";
@@ -91,12 +91,12 @@ namespace ASCOM.USB_Focus
         internal static string maxStepsProfileName = "Max Steps"; // Constants used for Profile persistence
         internal static string isLogEnabledProfileName = "Log Enabled"; // Constants used for Profile persistence
         internal static string halfStepsProfileName = "Half Steps";
-        internal static string antiClockwiseProfileName = "Anti Clockwise";
+        internal static string reverseProfileName = "Reverse";
         internal static string motorSpeedProfileName = "Motor Speed";
 
         private bool checkingStatus = false; // flag pour réaliser un status du déplacement 
         private bool bMoving = false;       // Si true déplacement en cours
-        private int iPosition = 0;              // Store last known position (used to feed client app with last position when waiting thread to release comm port)
+        private int lastStepPosition = 0;              // Store last known position (used to feed client app with last position when waiting thread to release comm port)
         private int PID = 0;                    //identifiant de log Position
         private int CID = 0;                    //identifiant de log de commandes
 
@@ -253,9 +253,9 @@ namespace ASCOM.USB_Focus
 
                             // on vérifie si le : checkingStatus
                             checkingStatus = true;          // on force le get position
-                            int pos1 = (int)this.Position;   // get position
+                            int pos1 = this.stepPosition;   // get position
                             Thread.Sleep(100);          // petite pause
-                            int pos2 = (int)this.Position;   // get position
+                            int pos2 = this.stepPosition;   // get position
                             checkingStatus = false;         // on force le get position
 
                             if (pos1 == pos2)
@@ -356,6 +356,8 @@ namespace ASCOM.USB_Focus
 
                 if (value)
                 {
+                    //Connect
+
                     try
                     {
                         serialPort = new Serial();
@@ -370,12 +372,12 @@ namespace ASCOM.USB_Focus
                         throw new ASCOM.NotConnectedException("Serial port connection error:", ex);
                     }
 
-
+                    // Get current position
                     try
                     {
                         if (isLogEnabled)
                             Logger.Write("\r\n---------------------------------------------------------------------------------------INIT\r\n");
-                        iPosition = PAToSteps(this.Position);                          // Get current position and temp from Focuser
+                        lastStepPosition = this.stepPosition;                          // Get current position from Focuser
                     }
                     catch (Exception ex)
                     {
@@ -384,6 +386,7 @@ namespace ASCOM.USB_Focus
                         throw new ASCOM.NotConnectedException("Serial port connection error:", ex);
                     }
 
+                    // Set HalfSteps or FullSteps
                     try
                     {
                         if (halfSteps)
@@ -404,19 +407,21 @@ namespace ASCOM.USB_Focus
                         if (isLogEnabled)
                             Logger.Write("Half Step Setting Failed :" + ex.ToString());
                     }
+
+                    // Set reverse mode
                     try
                     {
-                        if (antiClockwise)
+                        if (reverse)
                         {
                             if (isLogEnabled)
                                 Logger.Write("\r\n---------------------------------------------------------------------------------------SMROTT\r\n");
-                            CommandString(string.Format("SMROTT"), true);
+                            CommandString(string.Format("SMROTH"), true);
                         }
                         else
                         {
                             if (isLogEnabled)
                                 Logger.Write("\r\n---------------------------------------------------------------------------------------SMROTH\r\n");
-                            CommandString(string.Format("SMROTH"), true);
+                            CommandString(string.Format("SMROTT"), true);
                         }
                     }
                     catch (Exception ex)
@@ -424,6 +429,8 @@ namespace ASCOM.USB_Focus
                         if (isLogEnabled)
                             Logger.Write("Half Step Setting Failed :" + ex.ToString());
                     }
+
+                    // Set Motor Speed
                     try
                     {
                         if (isLogEnabled)
@@ -434,6 +441,19 @@ namespace ASCOM.USB_Focus
                     {
                         if (isLogEnabled)
                             Logger.Write("Motor Speed Setting Failed :" + ex.ToString());
+                    }
+
+                    // Set Max Steps
+                    try
+                    {
+                        if (isLogEnabled)
+                            Logger.Write("\r\n---------------------------------------------------------------------------------------" + string.Format("M{0:00000}", maxSteps) + "\r\n");
+                        CommandString(string.Format("M{0:00000}", maxSteps), true);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (isLogEnabled)
+                            Logger.Write("Max Steps Setting Failed :" + ex.ToString());
                     }
                 }
                 else
@@ -497,7 +517,7 @@ namespace ASCOM.USB_Focus
 
         private int PAToSteps(float Position)
         {
-            int stepPosition = (int)((360 - Position) * maxSteps);
+            int stepPosition = (int)(Position * maxSteps / 360);
             if (isLogEnabled)
                 Logger.Write("Position Angle:" + Position.ToString() + " Step Position:" + stepPosition.ToString()); // Move to this position
             return stepPosition;
@@ -505,11 +525,10 @@ namespace ASCOM.USB_Focus
 
         public string PAToStepsPublic(string Position)
         {
-            float rotatorPosition = float.Parse(Position);
-            int stepPosition = (int)((360 - Position) * maxSteps);
-
+            int stepPosition = (int)(float.Parse(Position) * maxSteps / 360);
+            if (isLogEnabled)
+                Logger.Write("Position Angle:" + Position.ToString() + " Step Position:" + stepPosition.ToString()); // Move to this position
             return stepPosition.ToString();
-
         }
         private float StepsToPA(int steps)
         {
@@ -531,7 +550,7 @@ namespace ASCOM.USB_Focus
         {
             get
             {
-                return false;
+                return true;
             }
         }
 
@@ -581,21 +600,9 @@ namespace ASCOM.USB_Focus
 
         public void Move(float Position)
         {
-            int targetPosition = PAToSteps(Position);
+            float targetPosition = Position + rotatorPosition;
 
-            // No MOVE while moving
-            if (bMoving)
-                throw new ASCOM.InvalidOperationException("Focuser is moving, try again");
-
-            // Checks out of range target position
-            if (targetPosition < 0 || targetPosition > maxSteps)
-                throw new ASCOM.InvalidOperationException("Move to position out of range (0 to MaxStep)");
-
-            // Checks if target position != actual position
-            if (targetPosition == this.iPosition)
-                return;
-
-            MoveAbsolute(Position);
+            MoveAbsolute(targetPosition);
         }
 
         public void MoveAbsolute(float Position)
@@ -603,16 +610,31 @@ namespace ASCOM.USB_Focus
             string msgLog = "";
             CID++;
 
+            if (Position == rotatorPosition)
+                return;
+
+            if (Position >= 360.00)
+                Position -= 360;
+
+            if (Position < 0)
+                Position += 360;
+
+            // No MOVE while moving
+            if (bMoving)
+                throw new ASCOM.InvalidOperationException("Focuser is moving, try again");
+
             rotatorPosition = Position;
             int targetPosition = PAToSteps(Position);
-            int delta = targetPosition - this.iPosition;
+            int delta = targetPosition - this.lastStepPosition;
+
+
 
             bMoving = true;
 
             if (delta >= 0)
             {
                 // Debug
-                //System.Windows.Forms.MessageBox.Show("target position :" + targetPosition + ", current position :" + this.iPosition + ", move OUT:" + delta);
+                //System.Windows.Forms.MessageBox.Show("target position :" + targetPosition + ", current position :" + this.lastStepPosition + ", move OUT:" + delta);
                 msgLog += "\r\nCID" + CID + "---------------------------------------------------------------------------------------\r\n";
                 msgLog += "CID" + CID + " command :" + string.Format("O{0:00000}", delta);
                 CommandString(string.Format("O{0:00000}", delta), true);
@@ -620,7 +642,7 @@ namespace ASCOM.USB_Focus
             else if (delta < 0)
             {
                 // Debug
-                //System.Windows.Forms.MessageBox.Show("target position :" + targetPosition + ", current position :" + this.iPosition + ", move IN:" + -delta);
+                //System.Windows.Forms.MessageBox.Show("target position :" + targetPosition + ", current position :" + this.lastStepPosition + ", move IN:" + -delta);
                 msgLog += "\r\nCID" + CID + "---------------------------------------------------------------------------------------\r\n";
                 msgLog += "CID" + CID + " command :" + string.Format("I{0:00000}", -delta);
                 CommandString(string.Format("I{0:00000}", -delta), true);
@@ -631,6 +653,14 @@ namespace ASCOM.USB_Focus
         }
 
         public float Position
+        {
+            get
+            {
+                return StepsToPA(stepPosition);
+            }
+        }
+
+        private int stepPosition
         {
             get
             {
@@ -650,7 +680,7 @@ namespace ASCOM.USB_Focus
                     if (!checkingStatus)
                     {
                         if (bMoving)
-                            return iPosition;
+                            return lastStepPosition;
                     }
                     // sinon on rentre en forçant le passage..
 
@@ -686,8 +716,8 @@ namespace ASCOM.USB_Focus
 
                                 if (newPos >= 0 && newPos <= maxSteps)
                                 {
-                                    iPosition = newPos;
-                                    msgLog += "PID" + PID + ", good value :" + iPosition;
+                                    lastStepPosition = newPos;
+                                    msgLog += "PID" + PID + ", good value :" + lastStepPosition;
                                     break;
                                 }
                             }
@@ -710,7 +740,7 @@ namespace ASCOM.USB_Focus
                     if (isLogEnabled)
                         Logger.Write(msgLog);
 
-                    return StepsToPA(iPosition);
+                    return lastStepPosition;
                 }
                 catch (Exception ex)
                 {
@@ -721,26 +751,17 @@ namespace ASCOM.USB_Focus
                     throw new ASCOM.InvalidValueException("PID" + PID + " ER2," + ret + "##, P:" + ret.IndexOf("P=") + "\\r\\n" + ret.IndexOf("\n\r") + "length:" + ret.Length, ex);
                 }
             }
-
-            set
-            {
-                int stepPosition = PAToSteps(value);
-
-                if (isLogEnabled)
-                    Logger.Write("Setting Position Angle to " + value + "; Corresponding Stepper position is " + stepPosition);
-                CommandString(string.Format("C{0:00000}", stepPosition), true);
-            }
         }
 
         public bool Reverse
         {
             get
             {
-                throw new ASCOM.PropertyNotImplementedException("Reverse", false);
+                return reverse;
             }
             set
             {
-                throw new ASCOM.PropertyNotImplementedException("Reverse", true);
+                reverse = value;
             }
         }
 
@@ -852,7 +873,7 @@ namespace ASCOM.USB_Focus
                 maxSteps = int.Parse(driverProfile.GetValue(driverID, maxStepsProfileName, string.Empty, maxStepsDefault));
                 isLogEnabled = Convert.ToBoolean(driverProfile.GetValue(driverID, isLogEnabledProfileName, string.Empty, isLogEnabled.ToString()));
                 halfSteps = Convert.ToBoolean(driverProfile.GetValue(driverID, halfStepsProfileName, string.Empty, halfSteps.ToString()));
-                antiClockwise = Convert.ToBoolean(driverProfile.GetValue(driverID, antiClockwiseProfileName, string.Empty, antiClockwise.ToString()));
+                reverse = Convert.ToBoolean(driverProfile.GetValue(driverID, reverseProfileName, string.Empty, reverse.ToString()));
                 motorSpeed = int.Parse(driverProfile.GetValue(driverID, motorSpeedProfileName, string.Empty, motorSpeedDefault.ToString()));
             }
         }
@@ -869,7 +890,7 @@ namespace ASCOM.USB_Focus
                 driverProfile.WriteValue(driverID, maxStepsProfileName, maxSteps.ToString());
                 driverProfile.WriteValue(driverID, isLogEnabledProfileName, isLogEnabled.ToString());
                 driverProfile.WriteValue(driverID, halfStepsProfileName, halfSteps.ToString());
-                driverProfile.WriteValue(driverID, antiClockwiseProfileName, antiClockwise.ToString());
+                driverProfile.WriteValue(driverID, reverseProfileName, reverse.ToString());
                 driverProfile.WriteValue(driverID, motorSpeedProfileName, motorSpeed.ToString());
             }
         }

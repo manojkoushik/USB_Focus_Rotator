@@ -28,7 +28,7 @@ namespace ASCOM.USB_Focus
             Rotator.maxSteps = int.Parse(textBoxMaxSteps.Text);
             Rotator.isLogEnabled = chkLog.Checked;
             Rotator.halfSteps = chkHalfSteps.Checked;
-            Rotator.antiClockwise = chkAntiClockwise.Checked;
+            Rotator.reverse = chkReverse.Checked;
             Rotator.motorSpeed = int.Parse(comboMotorSpeed.Text);
         }
 
@@ -58,7 +58,7 @@ namespace ASCOM.USB_Focus
         {
             chkLog.Checked = Rotator.isLogEnabled;
             chkHalfSteps.Checked = Rotator.halfSteps;
-            chkAntiClockwise.Checked = Rotator.antiClockwise;
+            chkReverse.Checked = Rotator.reverse;
             textBoxMaxSteps.Text = Rotator.maxSteps.ToString();
             comboMotorSpeed.SelectedItem = Rotator.motorSpeed.ToString();
             // set the list of com ports to those that are currently available

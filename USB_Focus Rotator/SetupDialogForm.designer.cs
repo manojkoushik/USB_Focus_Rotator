@@ -37,7 +37,7 @@ namespace ASCOM.USB_Focus
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxMaxSteps = new System.Windows.Forms.TextBox();
             this.chkHalfSteps = new System.Windows.Forms.CheckBox();
-            this.chkAntiClockwise = new System.Windows.Forms.CheckBox();
+            this.chkReverse = new System.Windows.Forms.CheckBox();
             this.comboMotorSpeed = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
@@ -140,17 +140,15 @@ namespace ASCOM.USB_Focus
             this.chkHalfSteps.Text = "Half Steps";
             this.chkHalfSteps.UseVisualStyleBackColor = true;
             // 
-            // chkAntiClockwise
+            // chkReverse
             // 
-            this.chkAntiClockwise.AutoSize = true;
-            this.chkAntiClockwise.Checked = true;
-            this.chkAntiClockwise.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkAntiClockwise.Location = new System.Drawing.Point(552, 379);
-            this.chkAntiClockwise.Name = "chkAntiClockwise";
-            this.chkAntiClockwise.Size = new System.Drawing.Size(238, 36);
-            this.chkAntiClockwise.TabIndex = 11;
-            this.chkAntiClockwise.Text = "Anti Clockwise";
-            this.chkAntiClockwise.UseVisualStyleBackColor = true;
+            this.chkReverse.AutoSize = true;
+            this.chkReverse.Location = new System.Drawing.Point(552, 379);
+            this.chkReverse.Name = "chkReverse";
+            this.chkReverse.Size = new System.Drawing.Size(158, 36);
+            this.chkReverse.TabIndex = 11;
+            this.chkReverse.Text = "Reverse";
+            this.chkReverse.UseVisualStyleBackColor = true;
             // 
             // comboMotorSpeed
             // 
@@ -186,7 +184,7 @@ namespace ASCOM.USB_Focus
             this.ClientSize = new System.Drawing.Size(945, 455);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.comboMotorSpeed);
-            this.Controls.Add(this.chkAntiClockwise);
+            this.Controls.Add(this.chkReverse);
             this.Controls.Add(this.chkHalfSteps);
             this.Controls.Add(this.textBoxMaxSteps);
             this.Controls.Add(this.label3);
@@ -221,7 +219,7 @@ namespace ASCOM.USB_Focus
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxMaxSteps;
         private System.Windows.Forms.CheckBox chkHalfSteps;
-        private System.Windows.Forms.CheckBox chkAntiClockwise;
+        private System.Windows.Forms.CheckBox chkReverse;
         private System.Windows.Forms.ComboBox comboMotorSpeed;
         private System.Windows.Forms.Label label1;
     }

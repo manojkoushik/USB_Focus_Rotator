@@ -110,127 +110,87 @@ namespace ASCOM.USB_Focus
 
         private void button1_Click(object sender, EventArgs e)
         {
-            float positionAngle = float.Parse(goToPA.Text);
-            if (positionAngle > 360 || positionAngle < 0)
+            float positionAngle;
+            if (float.TryParse(goToPA.Text, out positionAngle))
             {
-                MessageBox("Invalid Position Angle!");
-                return;
+                driver.MoveAbsolute(positionAngle);
             }
-            driver.Move(positionAngle);
+            else
+            {
+                MessageBox.Show("Need a Position Angle!");
+            }
         }
 
-        private float calcNewPA(float oldPA, float offset)
-        {
-            float newPA = oldPA + offset;
-            if (newPA > 360)
-                newPA = 360;
-
-            if (newPA < 0)
-                newPA = 0;
-
-            return newPA;
-        }
 
         private void but1c_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos,1));
+                    driver.Move(1);
                 }
         }
 
         private void but5c_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos, 5));
+                    driver.Move(5);
                 }
         }
 
         private void but10c_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos, 10));
+                    driver.Move(10);
                 }
         }
 
         private void but15c_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos, 15));
+                    driver.Move(15);
                 }
         }
 
         private void but15ac_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos, -15));
+                    driver.Move(-15);
                 }
         }
 
         private void but10ac_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos, -10));
+                    driver.Move(-10);
                 }
         }
 
         private void but5ac_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos, -5));
+                    driver.Move(-5);
                 }
         }
 
         private void but1ac_Click(object sender, EventArgs e)
         {
-            float currentPos;
             if (IsConnected)
                 if (!driver.IsMoving)
                 {
-                    currentPos = driver.TargetPosition;
-                    driver.Move(calcNewPA(currentPos, -1));
-                }
-        }
-
-        private void butSyncPA_Click(object sender, EventArgs e)
-        {
-            if (IsConnected)
-                if (!driver.IsMoving)
-                {
-                    float PA = syncPA.Text;
-                    if (PA > 360 || PA < 0)
-                    {
-                        MessageBox("Invalid Position Angle!");
-                        return;
-                    }             
-                    driver.Position = float.Parse(this.syncPA.Text);
+                    driver.Move(-1);
                 }
         }
     }
